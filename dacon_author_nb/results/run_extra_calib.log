@@ -1,0 +1,53 @@
+[train] 54,728행  열=['index', 'text', 'author']
+[test ] 19,617행  열=['index', 'text']
+[sample_submission] 19,617행  열=['index', '0', '1', '2', '3', '4']
+[작가 분포] 0: 13,222 (24.2%)  1: 7,219 (13.2%)  2: 11,466 (21.0%)  3: 15,051 (27.5%)  4: 7,770 (14.2%)
+[문장 길이(글자)] train 평균 228 / 중앙 119  |  test 평균 487 / 중앙 378 / 최소 131
+  → 테스트 최소 길이(131자) 이상인 학습 행: 45.8%
+[출력 폴더] /home/billy/TIC-VLA/.claude/worktrees/naive-bayes-final-project-56499f/dacon_author_nb
+
+[1/4] mnb_count_word12_a1_calsig
+   fold 1 완료 | 특징 168,028개 | logloss mnb_count_word12_a1_calsig=0.6825
+   fold 0 완료 | 특징 168,569개 | logloss mnb_count_word12_a1_calsig=0.6722
+   fold 2 완료 | 특징 168,739개 | logloss mnb_count_word12_a1_calsig=0.6770
+   fold 3 완료 | 특징 168,722개 | logloss mnb_count_word12_a1_calsig=0.7052
+   fold 4 완료 | 특징 168,851개 | logloss mnb_count_word12_a1_calsig=0.6750
+  ✔ mnb_count_word12_a1_calsig         logloss 0.6824 (±0.0119)  acc 0.8069  F1 0.7993  긴문장 logloss 0.4958
+  (이 묶음 15s, 누적 15s)
+
+[2/4] mnb_count_word12_a1_caliso
+   fold 0 완료 | 특징 168,569개 | logloss mnb_count_word12_a1_caliso=0.5388
+   fold 2 완료 | 특징 168,739개 | logloss mnb_count_word12_a1_caliso=0.5466
+   fold 1 완료 | 특징 168,028개 | logloss mnb_count_word12_a1_caliso=0.5562
+   fold 3 완료 | 특징 168,722개 | logloss mnb_count_word12_a1_caliso=0.5714
+   fold 4 완료 | 특징 168,851개 | logloss mnb_count_word12_a1_caliso=0.5466
+  ✔ mnb_count_word12_a1_caliso         logloss 0.5519 (±0.0112)  acc 0.8117  F1 0.8041  긴문장 logloss 0.3668
+  (이 묶음 13s, 누적 29s)
+
+[3/4] bnb_count_word11_a0.03_calsig
+   fold 0 완료 | 특징 21,485개 | logloss bnb_count_word11_a0.03_calsig=0.8440
+   fold 2 완료 | 특징 21,503개 | logloss bnb_count_word11_a0.03_calsig=0.8362
+   fold 1 완료 | 특징 21,399개 | logloss bnb_count_word11_a0.03_calsig=0.8171
+   fold 3 완료 | 특징 21,469개 | logloss bnb_count_word11_a0.03_calsig=0.8375
+   fold 4 완료 | 특징 21,512개 | logloss bnb_count_word11_a0.03_calsig=0.8424
+  ✔ bnb_count_word11_a0.03_calsig      logloss 0.8355 (±0.0096)  acc 0.7334  F1 0.7140  긴문장 logloss 0.6481
+  (이 묶음 5s, 누적 33s)
+
+[4/4] bnb_count_word11_a0.03_caliso
+   fold 0 완료 | 특징 21,485개 | logloss bnb_count_word11_a0.03_caliso=0.7191
+   fold 1 완료 | 특징 21,399개 | logloss bnb_count_word11_a0.03_caliso=0.6928
+   fold 2 완료 | 특징 21,503개 | logloss bnb_count_word11_a0.03_caliso=0.7090
+   fold 4 완료 | 특징 21,512개 | logloss bnb_count_word11_a0.03_caliso=0.7228
+   fold 3 완료 | 특징 21,469개 | logloss bnb_count_word11_a0.03_caliso=0.7167
+  ✔ bnb_count_word11_a0.03_caliso      logloss 0.7121 (±0.0107)  acc 0.7398  F1 0.7229  긴문장 logloss 0.5512
+  (이 묶음 5s, 누적 38s)
+
+총 소요 38s  |  결과표: /home/billy/TIC-VLA/.claude/worktrees/naive-bayes-final-project-56499f/dacon_author_nb/results/nb_results.csv
+
+===== OOF logloss 상위 5개 =====
+                         실험이름            모델           벡터라이저   단위 n-gram alpha       보정  전처리 logloss 긴문장 logloss accuracy macro_f1  소요(s)
+mnb_tfidf_word12_a0.03_caliso MultinomialNB TfidfVectorizer word  (1,2)  0.03 isotonic keep  0.4725      0.2863   0.8326   0.8257   67.8
+       mnb_tfidf_word12_a0.03 MultinomialNB TfidfVectorizer word  (1,2)  0.03     none keep  0.4900      0.3118   0.8291   0.8219   18.9
+       mnb_tfidf_word12_a0.01 MultinomialNB TfidfVectorizer word  (1,2)  0.01     none keep  0.4949      0.3050   0.8251   0.8177   18.9
+mnb_tfidf_word12_a0.03_calsig MultinomialNB TfidfVectorizer word  (1,2)  0.03  sigmoid keep  0.5063      0.3228   0.8317   0.8245   68.5
+        mnb_tfidf_word12_a0.1 MultinomialNB TfidfVectorizer word  (1,2)   0.1     none keep  0.5256      0.3562   0.8254   0.8168   18.9
