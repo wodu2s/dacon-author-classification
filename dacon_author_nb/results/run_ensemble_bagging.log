@@ -1,0 +1,25 @@
+[데이터] 학습 54,728행 / 테스트 19,617행  |  폴드 C:\dev\dacon-author-classification\dacon_author_nb\outputs\folds.csv  |  출력 C:\dev\dacon-author-classification\dacon_author_nb
+
+[1/1] bag10_mnb_tfidf_word12_a0.03
+   fold 0 완료 (22s) | 특징 168,569개 | logloss bag10_mnb_tfidf_word12_a0.03=0.5017
+   fold 1 완료 (39s) | 특징 168,028개 | logloss bag10_mnb_tfidf_word12_a0.03=0.5038
+   fold 2 완료 (55s) | 특징 168,739개 | logloss bag10_mnb_tfidf_word12_a0.03=0.5096
+   fold 3 완료 (71s) | 특징 168,722개 | logloss bag10_mnb_tfidf_word12_a0.03=0.5277
+   fold 4 완료 (88s) | 특징 168,851개 | logloss bag10_mnb_tfidf_word12_a0.03=0.4982
+  ✔ bag10_mnb_tfidf_word12_a0.03             logloss 0.5082 (±0.0104)  acc 0.8276  F1 0.8201  긴문장 0.3346  (88s)  [특징 168,581개(폴드 평균)]
+  (이 묶음 88s, 누적 88s)
+
+[1/1] bag10_lr_tfidf_word12_C16
+   fold 0 완료 (104s) | 특징 168,569개 | logloss bag10_lr_tfidf_word12_C16=0.4838
+   fold 1 완료 (265s) | 특징 168,028개 | logloss bag10_lr_tfidf_word12_C16=0.4855
+   fold 2 완료 (454s) | 특징 168,739개 | logloss bag10_lr_tfidf_word12_C16=0.4926
+   fold 3 완료 (639s) | 특징 168,722개 | logloss bag10_lr_tfidf_word12_C16=0.4971
+   fold 4 완료 (844s) | 특징 168,851개 | logloss bag10_lr_tfidf_word12_C16=0.4880
+  ✔ bag10_lr_tfidf_word12_C16                logloss 0.4894 (±0.0049)  acc 0.8334  F1 0.8253  긴문장 0.3286  (843s)  [특징 168,581개(폴드 평균)]
+  (이 묶음 844s, 누적 844s)
+
+총 소요 932s
+
+===== 배깅 vs 단일 모델 (OOF logloss) =====
+  mnb_tfidf_word12_a0.03           단일 0.4900  →  배깅 0.5082  (차이 +0.0182)
+  lr_tfidf_word12_C16              단일 0.4603  →  배깅 0.4894  (차이 +0.0291)

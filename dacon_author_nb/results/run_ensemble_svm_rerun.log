@@ -1,0 +1,22 @@
+[데이터] 학습 54,728행 / 테스트 19,617행  |  폴드 C:\dev\dacon-author-classification\dacon_author_nb\outputs\folds.csv  |  출력 C:\dev\dacon-author-classification\dacon_author_nb
+[NB 재사용] mnb_tfidf_word12_a0.03_caliso  OOF logloss 0.4725207260463781
+
+[1/1] svm_tfidf_word12_C0.1_calsig
+   fold 1 완료 (54s) | 특징 168,028개 | logloss svm_tfidf_word12_C0.1_calsig=0.5403
+   fold 0 완료 (54s) | 특징 168,569개 | logloss svm_tfidf_word12_C0.1_calsig=0.5352
+   fold 2 완료 (107s) | 특징 168,739개 | logloss svm_tfidf_word12_C0.1_calsig=0.5476
+   fold 3 완료 (107s) | 특징 168,722개 | logloss svm_tfidf_word12_C0.1_calsig=0.5454
+   fold 4 완료 (175s) | 특징 168,851개 | logloss svm_tfidf_word12_C0.1_calsig=0.5415
+  ✔ svm_tfidf_word12_C0.1_calsig             logloss 0.5420 (±0.0043)  acc 0.8250  F1 0.8170  긴문장 0.3783  (274s)  [특징 168,581개(폴드 평균)]
+  (이 묶음 175s, 누적 175s)
+
+총 소요 175s  |  결과표: C:\dev\dacon-author-classification\dacon_author_nb\results\ensemble_results.csv
+                         exp  logloss  accuracy  macro_f1  time_sec
+         lr_tfidf_word12_C16 0.460321  0.840064  0.832604     243.4
+svm_tfidf_word12_C0.5_calsig 0.476225  0.846093  0.839324     220.8
+          lr_tfidf_word12_C4 0.499655  0.838218  0.830492     210.3
+       lr_tfidf_charwb15_C16 0.539619  0.806881  0.797930     688.9
+svm_tfidf_word12_C0.1_calsig 0.542010  0.824952  0.816956     274.5
+        lr_tfidf_charwb15_C4 0.544116  0.811358  0.802521     593.1
+          lr_tfidf_word12_C1 0.617986  0.819654  0.810105     173.9
+        lr_tfidf_charwb15_C1 0.633979  0.799024  0.789118     466.7

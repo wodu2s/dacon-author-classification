@@ -1,0 +1,59 @@
+[데이터] 학습 54,728행 / 테스트 19,617행  |  폴드 C:\dev\dacon-author-classification\dacon_author_nb\outputs\folds.csv  |  출력 C:\dev\dacon-author-classification\dacon_author_nb
+[NB 재사용] mnb_tfidf_word12_a0.03_caliso  OOF logloss 0.4725207260463781
+
+========== lr_word: 실험 3개 ==========
+
+[1/1] lr_tfidf_word12_C1, lr_tfidf_word12_C4, lr_tfidf_word12_C16
+   fold 1 완료 (98s) | 특징 168,028개 | logloss lr_tfidf_word12_C1=0.6179, lr_tfidf_word12_C4=0.4949, lr_tfidf_word12_C16=0.4571
+   fold 0 완료 (98s) | 특징 168,569개 | logloss lr_tfidf_word12_C1=0.6115, lr_tfidf_word12_C4=0.4947, lr_tfidf_word12_C16=0.4538
+   fold 3 완료 (208s) | 특징 168,722개 | logloss lr_tfidf_word12_C1=0.6211, lr_tfidf_word12_C4=0.5075, lr_tfidf_word12_C16=0.4672
+   fold 2 완료 (214s) | 특징 168,739개 | logloss lr_tfidf_word12_C1=0.6206, lr_tfidf_word12_C4=0.5035, lr_tfidf_word12_C16=0.4646
+   fold 4 완료 (326s) | 특징 168,851개 | logloss lr_tfidf_word12_C1=0.6189, lr_tfidf_word12_C4=0.4977, lr_tfidf_word12_C16=0.4588
+  ✔ lr_tfidf_word12_C1                       logloss 0.6180 (±0.0035)  acc 0.8197  F1 0.8101  긴문장 0.4919  (174s)  [특징 168,581개(폴드 평균)]
+  ✔ lr_tfidf_word12_C4                       logloss 0.4997 (±0.0050)  acc 0.8382  F1 0.8305  긴문장 0.3504  (210s)  [특징 168,581개(폴드 평균)]
+  ✔ lr_tfidf_word12_C16                      logloss 0.4603 (±0.0049)  acc 0.8401  F1 0.8326  긴문장 0.2886  (243s)  [특징 168,581개(폴드 평균)]
+  (이 묶음 326s, 누적 326s)
+
+========== lr_char: 실험 3개 ==========
+
+[1/1] lr_tfidf_charwb15_C1, lr_tfidf_charwb15_C4, lr_tfidf_charwb15_C16
+   fold 1 완료 (237s) | 특징 134,523개 | logloss lr_tfidf_charwb15_C1=0.6333, lr_tfidf_charwb15_C4=0.5434, lr_tfidf_charwb15_C16=0.5378
+   fold 0 완료 (253s) | 특징 135,182개 | logloss lr_tfidf_charwb15_C1=0.6260, lr_tfidf_charwb15_C4=0.5339, lr_tfidf_charwb15_C16=0.5260
+   fold 3 완료 (487s) | 특징 135,206개 | logloss lr_tfidf_charwb15_C1=0.6394, lr_tfidf_charwb15_C4=0.5529, lr_tfidf_charwb15_C16=0.5528
+   fold 2 완료 (496s) | 특징 134,959개 | logloss lr_tfidf_charwb15_C1=0.6342, lr_tfidf_charwb15_C4=0.5442, lr_tfidf_charwb15_C16=0.5405
+   fold 4 완료 (808s) | 특징 134,943개 | logloss lr_tfidf_charwb15_C1=0.6371, lr_tfidf_charwb15_C4=0.5462, lr_tfidf_charwb15_C16=0.5410
+  ✔ lr_tfidf_charwb15_C1                     logloss 0.6340 (±0.0045)  acc 0.7990  F1 0.7891  긴문장 0.4872  (467s)  [특징 134,962개(폴드 평균)]
+  ✔ lr_tfidf_charwb15_C4                     logloss 0.5441 (±0.0061)  acc 0.8114  F1 0.8025  긴문장 0.3721  (593s)  [특징 134,962개(폴드 평균)]
+  ✔ lr_tfidf_charwb15_C16                    logloss 0.5396 (±0.0085)  acc 0.8069  F1 0.7979  긴문장 0.3367  (689s)  [특징 134,962개(폴드 평균)]
+  (이 묶음 808s, 누적 808s)
+
+========== svm: 실험 2개 ==========
+
+[1/2] svm_tfidf_word12_C0.1_calsig
+   fold 0 완료 (46s) | 특징 168,569개 | logloss svm_tfidf_word12_C0.1_calsig=0.5352
+   fold 1 완료 (50s) | 특징 168,028개 | logloss svm_tfidf_word12_C0.1_calsig=0.5403
+   fold 2 완료 (93s) | 특징 168,739개 | logloss svm_tfidf_word12_C0.1_calsig=0.5476
+   fold 3 완료 (96s) | 특징 168,722개 | logloss svm_tfidf_word12_C0.1_calsig=0.5454
+   fold 4 완료 (12403s) | 특징 168,851개 | logloss svm_tfidf_word12_C0.1_calsig=0.5415
+  ✔ svm_tfidf_word12_C0.1_calsig             logloss 0.5420 (±0.0043)  acc 0.8250  F1 0.8170  긴문장 0.3783  (12494s)  [특징 168,581개(폴드 평균)]
+  (이 묶음 12403s, 누적 12403s)
+
+[2/2] svm_tfidf_word12_C0.5_calsig
+   fold 0 완료 (45s) | 특징 168,569개 | logloss svm_tfidf_word12_C0.5_calsig=0.4689
+   fold 1 완료 (46s) | 특징 168,028개 | logloss svm_tfidf_word12_C0.5_calsig=0.4741
+   fold 2 완료 (85s) | 특징 168,739개 | logloss svm_tfidf_word12_C0.5_calsig=0.4839
+   fold 3 완료 (85s) | 특징 168,722개 | logloss svm_tfidf_word12_C0.5_calsig=0.4817
+   fold 4 완료 (137s) | 특징 168,851개 | logloss svm_tfidf_word12_C0.5_calsig=0.4725
+  ✔ svm_tfidf_word12_C0.5_calsig             logloss 0.4762 (±0.0057)  acc 0.8461  F1 0.8393  긴문장 0.3117  (221s)  [특징 168,581개(폴드 평균)]
+  (이 묶음 137s, 누적 12540s)
+
+총 소요 13675s  |  결과표: C:\dev\dacon-author-classification\dacon_author_nb\results\ensemble_results.csv
+                         exp  logloss  accuracy  macro_f1  time_sec
+         lr_tfidf_word12_C16 0.460321  0.840064  0.832604     243.4
+svm_tfidf_word12_C0.5_calsig 0.476225  0.846093  0.839324     220.8
+          lr_tfidf_word12_C4 0.499655  0.838218  0.830492     210.3
+       lr_tfidf_charwb15_C16 0.539619  0.806881  0.797930     688.9
+svm_tfidf_word12_C0.1_calsig 0.542010  0.824952  0.816956   12494.3
+        lr_tfidf_charwb15_C4 0.544116  0.811358  0.802521     593.1
+          lr_tfidf_word12_C1 0.617986  0.819654  0.810105     173.9
+        lr_tfidf_charwb15_C1 0.633979  0.799024  0.789118     466.7

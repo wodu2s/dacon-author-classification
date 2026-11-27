@@ -1,0 +1,11 @@
+{
+  "exp": "stack_lgbm_nb-lrw-lrc-svm",
+  "method": "스태킹",
+  "models": "LightGBM ← nb=mnb_tfidf_word12_a0.03_caliso + lrw=lr_tfidf_word12_C16 + lrc=lr_tfidf_charwb15_C16 + svm=svm_tfidf_word12_C0.5_calsig",
+  "settings": "LightGBM 메타 (num_leaves=15, learning_rate=0.05, subsample=0.8, colsample_bytree=0.8, early stopping 100라운드 · 학습 부분의 10%로 판단), 입력=기본 모델 log 확률",
+  "clip": null,
+  "oof_logloss": 0.3805912340966112,
+  "oof_accuracy": 0.8654984651366759,
+  "oof_macro_f1": 0.8600861991777023,
+  "test_pred": "outputs/test_pred/stack_lgbm_nb-lrw-lrc-svm.npy"
+}

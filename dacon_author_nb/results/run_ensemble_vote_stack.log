@@ -1,0 +1,76 @@
+[데이터] 학습 54,728행 / 테스트 19,617행  |  폴드 C:\dev\dacon-author-classification\dacon_author_nb\outputs\folds.csv  |  출력 C:\dev\dacon-author-classification\dacon_author_nb
+[재료] nb=mnb_tfidf_word12_a0.03_caliso, lrw=lr_tfidf_word12_C16, lrc=lr_tfidf_charwb15_C16, svm=svm_tfidf_word12_C0.5_calsig
+
+[nb-lrw]
+  ✔ vote_mean_nb-lrw                         logloss 0.4207 (±0.0068)  acc 0.8605  F1 0.8543  긴문장 0.2603  (0s)
+  ✔ vote_wopt_nb-lrw                         logloss 0.4207 (±0.0067)  acc 0.8607  F1 0.8545  긴문장 0.2606  (0s)  [가중치를 OOF 전체로 찾음(약간 낙관적). 폴드별로 가중치를 다시 찾아 검증한 logloss 0.4207]
+
+[nb-lrc]
+  ✔ vote_mean_nb-lrc                         logloss 0.4416 (±0.0088)  acc 0.8512  F1 0.8445  긴문장 0.2720  (0s)
+  ✔ vote_wopt_nb-lrc                         logloss 0.4374 (±0.0090)  acc 0.8497  F1 0.8433  긴문장 0.2674  (0s)  [가중치를 OOF 전체로 찾음(약간 낙관적). 폴드별로 가중치를 다시 찾아 검증한 logloss 0.4374]
+
+[nb-lrw-svm]
+  ✔ vote_mean_nb-lrw-svm                     logloss 0.4276 (±0.0062)  acc 0.8602  F1 0.8540  긴문장 0.2712  (0s)
+  ✔ vote_wopt_nb-lrw-svm                     logloss 0.4207 (±0.0067)  acc 0.8607  F1 0.8545  긴문장 0.2606  (0s)  [가중치를 OOF 전체로 찾음(약간 낙관적). 폴드별로 가중치를 다시 찾아 검증한 logloss 0.4207]
+
+[nb-lrw-lrc-svm]
+  ✔ vote_mean_nb-lrw-lrc-svm                 logloss 0.4283 (±0.0064)  acc 0.8601  F1 0.8539  긴문장 0.2715  (0s)
+  ✔ vote_wopt_nb-lrw-lrc-svm                 logloss 0.4191 (±0.0069)  acc 0.8622  F1 0.8562  긴문장 0.2598  (0s)  [가중치를 OOF 전체로 찾음(약간 낙관적). 폴드별로 가중치를 다시 찾아 검증한 logloss 0.4192]
+
+===== soft voting 결과 (OOF logloss 순) =====
+                     exp  logloss  accuracy  macro_f1                                                                                   settings
+vote_wopt_nb-lrw-lrc-svm 0.419130  0.862228  0.856158 가중 평균 w=[NB 0.455, LR 단어 0.446, LR 글자 0.099, SVM 0.000] (OOF logloss 최소화, SLSQP, 합=1·0 이상)
+        vote_wopt_nb-lrw 0.420688  0.860693  0.854515                         가중 평균 w=[NB 0.479, LR 단어 0.521] (OOF logloss 최소화, SLSQP, 합=1·0 이상)
+    vote_wopt_nb-lrw-svm 0.420688  0.860693  0.854515              가중 평균 w=[NB 0.479, LR 단어 0.521, SVM 0.000] (OOF logloss 최소화, SLSQP, 합=1·0 이상)
+        vote_mean_nb-lrw 0.420742  0.860474  0.854344                                                                             단순 평균 (가중치 동일)
+    vote_mean_nb-lrw-svm 0.427562  0.860236  0.854006                                                                             단순 평균 (가중치 동일)
+vote_mean_nb-lrw-lrc-svm 0.428339  0.860072  0.853905                                                                             단순 평균 (가중치 동일)
+        vote_wopt_nb-lrc 0.437374  0.849748  0.843264                         가중 평균 w=[NB 0.659, LR 글자 0.341] (OOF logloss 최소화, SLSQP, 합=1·0 이상)
+        vote_mean_nb-lrc 0.441622  0.851246  0.844486                                                                             단순 평균 (가중치 동일)
+[데이터] 학습 54,728행 / 테스트 19,617행  |  폴드 C:\dev\dacon-author-classification\dacon_author_nb\outputs\folds.csv  |  출력 C:\dev\dacon-author-classification\dacon_author_nb
+[스태킹 입력] nb=mnb_tfidf_word12_a0.03_caliso + lrw=lr_tfidf_word12_C16 + lrc=lr_tfidf_charwb15_C16 + svm=svm_tfidf_word12_C0.5_calsig  →  학습 (54728, 20), 테스트 (19617, 20)
+
+[메타 모델: lgbm]
+   fold 0 완료 | logloss 0.3717 | best_iteration 119
+   fold 1 완료 | logloss 0.3786 | best_iteration 121
+   fold 2 완료 | logloss 0.3823 | best_iteration 169
+   fold 3 완료 | logloss 0.3956 | best_iteration 135
+   fold 4 완료 | logloss 0.3747 | best_iteration 126
+  ✔ stack_lgbm_nb-lrw-lrc-svm                logloss 0.3806 (±0.0083)  acc 0.8655  F1 0.8601  긴문장 0.2047  (15s)  [폴드별 best_iteration [119, 121, 169, 135, 126]; 1단계와 같은 폴드로 검증해 약간 낙관적일 수 있음]
+
+[메타 모델: lr]
+   fold 0 완료 | logloss 0.3770
+   fold 1 완료 | logloss 0.3827
+   fold 2 완료 | logloss 0.3857
+   fold 3 완료 | logloss 0.4001
+   fold 4 완료 | logloss 0.3795
+  ✔ stack_lr_nb-lrw-lrc-svm                  logloss 0.3850 (±0.0081)  acc 0.8653  F1 0.8596  긴문장 0.2108  (18s)  [1단계와 같은 폴드로 검증해 약간 낙관적일 수 있음]
+
+===== 스태킹 결과 =====
+                      exp  logloss  accuracy  macro_f1  time_sec
+stack_lgbm_nb-lrw-lrc-svm 0.380591  0.865498  0.860086      15.1
+  stack_lr_nb-lrw-lrc-svm 0.385013  0.865297  0.859598      17.6
+===== 방식별 최고 OOF logloss (NB 단계 최고와 비교) =====
+                방식                          실험이름 logloss accuracy macro_f1 긴문장 logloss  소요(s)
+나이브 베이즈 (NB 단계 최고) mnb_tfidf_word12_a0.03_caliso  0.4725   0.8326   0.8257      0.2863   67.8
+  단일 모델 (LR / SVM)           lr_tfidf_word12_C16  0.4603   0.8401   0.8326      0.2886  243.4
+                배깅     bag10_lr_tfidf_word12_C16  0.4894   0.8334   0.8253      0.3286  843.4
+       soft voting      vote_wopt_nb-lrw-lrc-svm  0.4191   0.8622   0.8562      0.2598    0.4
+   스태킹 (부스팅 메타 포함)     stack_lgbm_nb-lrw-lrc-svm  0.3806   0.8655   0.8601      0.2047   15.1
+
+===== 배깅 vs 단일 =====
+                 단일 모델 단일 logloss                        배깅 모델 배깅 logloss 차이(배깅-단일) 단일 acc 배깅 acc  소요(s)
+mnb_tfidf_word12_a0.03     0.4900 bag10_mnb_tfidf_word12_a0.03     0.5082   +0.0182 0.8291 0.8276   87.6
+   lr_tfidf_word12_C16     0.4603    bag10_lr_tfidf_word12_C16     0.4894   +0.0291 0.8401 0.8334  843.4
+
+요약 저장 → C:\dev\dacon-author-classification\dacon_author_nb\results\ensemble_summary.md
+그래프 저장 → C:\dev\dacon-author-classification\dacon_author_nb\results\ensemble_compare.png
+제출 파일 → C:\dev\dacon-author-classification\dacon_author_nb\outputs\submissions\ensemble_best.csv
+  실험: stack_lgbm_nb-lrw-lrc-svm [스태킹]  (OOF logloss 0.3806, acc 0.8655)
+  shape (19617, 6), 열 ['index', '0', '1', '2', '3', '4'], 행 합 min 1.000000 / max 1.000000, 확률 최솟값 7.83e-05
+  예측 작가 분포: [4526, 3502, 4132, 4653, 2804]
+  비교용 NB 제출 파일: C:\dev\dacon-author-classification\dacon_author_nb\outputs\submissions\nb_best.csv (있음)
+ index        0        1        2        3        4
+     0 0.016664 0.876577 0.095670 0.009599 0.001490
+     1 0.004803 0.992118 0.000359 0.001949 0.000772
+     2 0.998670 0.000488 0.000289 0.000258 0.000295

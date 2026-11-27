@@ -59,6 +59,21 @@ CALIB_INNER_FOLDS = 5                    # 보정기 학습용 내부 CV 폴드 
 
 N_JOBS = 5  # 폴드를 병렬로 돌릴 프로세스 수
 
+# ---------------------------------------------------------------------------
+# 앙상블 단계 설정 (③ 앙상블: 기본 모델 → 배깅 → soft voting → 스태킹)
+# ---------------------------------------------------------------------------
+NB_BEST = "mnb_tfidf_word12_a0.03_caliso"   # NB 단계 최고 설정 (OOF/테스트 확률을 재사용, 다시 학습하지 않음)
+NB_PLAIN = "mnb_tfidf_word12_a0.03"         # 같은 설정의 보정 없는 단일 NB (배깅 비교 기준)
+NB_BEST_ALPHA = 0.03                        # 배깅에 넣을 MultinomialNB 의 alpha (NB 단계 최고값)
+LR_CS = [1.0, 4.0, 16.0]                    # 로지스틱 회귀 규제 강도 C 후보 (클수록 규제 약함)
+SVM_CS = [0.1, 0.5]                         # 선형 SVM C 후보
+LR_MAX_ITER = 1000
+CHAR_NGRAM = (1, 5)                         # 글자(char_wb) n-gram 범위
+CHAR_MAX_FEATURES = 200_000                 # 글자 n-gram 특징 수 상한 (실행 시간·메모리 관리)
+BAG_N_ESTIMATORS = 10                       # 배깅: 부트스트랩 표본으로 학습할 모델 수
+BAG_MAX_SAMPLES = 0.8                       # 배깅: 모델 하나가 보는 표본 비율
+ENS_N_JOBS = 2                              # 기본 모델 폴드 병렬 수 (노트북 메모리 고려, --n-jobs 로 변경)
+
 
 def get_paths(data_version: str = DATA_VERSION, sample: int | None = None) -> SimpleNamespace:
     """출력 경로 모음. 데이터 버전/샘플 모드마다 폴더를 분리해 결과가 섞이지 않게 한다."""
@@ -75,6 +90,9 @@ def get_paths(data_version: str = DATA_VERSION, sample: int | None = None) -> Si
         results_csv=root / "results" / "nb_results.csv",
         alpha_plot=root / "results" / "alpha_logloss.png",
         summary_md=root / "results" / "nb_summary.md",
+        ens_results_csv=root / "results" / "ensemble_results.csv",   # 앙상블 단계 결과표 (누적)
+        ens_summary_md=root / "results" / "ensemble_summary.md",
+        ens_plot=root / "results" / "ensemble_compare.png",
     )
     for d in (p.oof_dir, p.test_dir, p.sub_dir, p.results_dir):
         d.mkdir(parents=True, exist_ok=True)
