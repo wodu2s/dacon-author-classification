@@ -23,13 +23,15 @@ dacon_author_nb/
 │   ├── run_nb.py            # 실험 실행 (단계별 / 이름 지정)
 │   ├── report.py            # 상위 5개 표, 단계별 요약(md), alpha-logloss 그래프
 │   ├── make_submission.py   # 최고 설정 → 제출 csv
-│   ├── ensemble_common.py   # [앙상블] 기본 모델(LR/SVM/배깅) 생성, 5-fold 실행, 결과 저장 공통 모듈
-│   ├── run_base.py          # [앙상블 4-1] 기본 모델: 로지스틱 회귀(단어·글자), 선형 SVM + 확률 보정
-│   ├── run_bagging.py       # [앙상블 4-2] 배깅
-│   ├── run_voting.py        # [앙상블 4-3] soft voting (단순 / 가중 평균)
-│   ├── run_stacking.py      # [앙상블 4-4] 스태킹 (LightGBM / 로지스틱 회귀 메타 모델)
-│   ├── report_ensemble.py   # [앙상블 4-5] 방식별 비교표 + 그래프
-│   └── make_ensemble_submission.py  # [앙상블 4-6] 최고 방법 → 제출 csv
+│   ├── ensemble_common.py   # [앙상블] 모델 생성, 5-fold 실행, 결과 저장 공통 모듈
+│   ├── run_base.py          # [앙상블] 단일 로지스틱 회귀(단어) (+ 참고 실험: 글자 n-gram LR, 선형 SVM)
+│   ├── run_bagging.py       # [앙상블·배깅] BaggingClassifier
+│   ├── run_adaboost.py      # [앙상블·부스팅] AdaBoostClassifier(MultinomialNB)
+│   ├── run_voting.py        # [앙상블·투표] soft voting 단순 평균 (--lecture) / 가중 평균(참고 실험)
+│   ├── make_lecture_results.py      # [앙상블·최종] 수업 범위 결과표·요약·PDF·final_lecture.csv
+│   ├── run_stacking.py      # [참고 실험] 스태킹 (LightGBM / 로지스틱 회귀 메타 모델)
+│   ├── report_ensemble.py   # [참고 실험 포함] 방식별 비교표 + 그래프
+│   └── make_ensemble_submission.py  # [참고 실험] 전체 결과표 최저 → ensemble_best.csv
 ├── outputs/
 │   ├── folds.csv            # ★ 팀 공유: 행 index → fold 번호
 │   ├── oof/{실험이름}.npy     # ★ 학습 전체 OOF 확률 (54,728 × 5)
@@ -37,16 +39,20 @@ dacon_author_nb/
 │   └── submissions/
 │       ├── nb_best.csv                 # ★ 데이콘 제출용 (+ nb_best.json: 어떤 실험인지)
 │       ├── nb_best_clip0.0001.csv      # 확률 하한 1e-4 적용본 (7절 참고)
-│       └── ensemble_best.csv           # ★ 앙상블 최고 방법 제출용 (+ ensemble_best.json, 8절 참고)
+│       ├── final_lecture.csv           # ★ 앙상블 최종(수업 범위) 제출용 (+ final_lecture.json, 8절 참고)
+│       └── ensemble_best.csv           # 참고 실험(스태킹) 제출 파일 (+ ensemble_best.json)
 ├── results/
 │   ├── nb_results.csv       # 실험 결과표 (실험마다 한 줄)
 │   ├── nb_summary.md        # 단계별 비교표 (보고서용)
 │   ├── alpha_logloss.png    # alpha 에 따른 logloss 그래프 (보고서용)
 │   ├── run_full.log, run_extra_calib.log   # 실행 로그
-│   ├── ensemble_results.csv # 앙상블 단계 결과표 (실험마다 한 줄)
-│   ├── ensemble_summary.md  # 방식별 비교표 (보고서용)
-│   ├── ensemble_compare.png # 방식별 최고 logloss 그래프 (보고서용)
-│   └── run_ensemble_*.log   # 앙상블 실행 로그
+│   ├── lecture_scope_results.csv    # ★ 앙상블 수업 범위 결과표 (방식·실험·설정·logloss·정확도·Macro-F1)
+│   ├── lecture_scope_summary.md     # ★ 수업 범위 비교표 + 최종 모델 (보고서용)
+│   ├── model_comparison_lecture.pdf # ★ 위 내용 A4 한 장
+│   ├── ensemble_results.csv # 앙상블 단계 전체 결과표 (참고 실험 포함, 실험마다 한 줄)
+│   ├── ensemble_summary.md  # 참고 실험 포함 방식별 비교표
+│   ├── ensemble_compare.png # 참고 실험 포함 방식별 최고 logloss 그래프
+│   └── run_ensemble_*.log, run_lecture_*.log   # 앙상블 실행 로그
 └── requirements.txt
 ```
 
@@ -204,93 +210,119 @@ test = np.load("outputs/test_pred/<실험>.npy")         # (19617, 5)
 
 ## 8. 앙상블 단계
 
-NB 단계와 **같은 `outputs/folds.csv`·같은 저장 형식**으로 기본 모델을 더 만들고, 수업에서 배운 앙상블
-세 가지(배깅, 투표 기반 분류기, 부스팅)를 적용했다. 나이브 베이즈는 NB 단계 최고 설정(`mnb_tfidf_word12_a0.03_caliso`)의
-OOF/테스트 확률을 그대로 재사용하고 다시 학습하지 않았다.
+NB 단계와 **같은 `outputs/folds.csv`·같은 저장 형식**으로 수업에서 배운 앙상블 세 가지(투표·배깅·부스팅)를 적용했다.
+최종 모델은 **수업 범위** 안에서 OOF logloss 가 가장 낮은 것으로 골랐다. 수업 범위 밖 기법으로 돌려 본 결과는
+[8-6 참고 실험](#8-6-참고-실험-수업-범위-밖)에 따로 짧게 정리했다.
 
-### 8-1. 실행 방법
+- 수업 범위(사용): 단어 TF-IDF (n-gram (1,2)까지), 나이브 베이즈(+NB 확률 보정), 로지스틱 회귀, 배깅(`BaggingClassifier`),
+  투표(soft voting 단순 평균), 부스팅(`AdaBoostClassifier`)
+- 수업 범위 밖(참고 실험): 선형 SVM, 글자 n-gram, 최적 가중치(wopt) voting, 스태킹
+
+### 8-1. 실행 방법 (수업 범위)
 
 ```bash
-python src/run_base.py                   # 4-1 기본 모델: LR(단어·글자) × C, 선형 SVM + 확률 보정 × C
-python src/run_bagging.py                # 4-2 배깅: MNB × 10, LR(OOF logloss 최저 설정) × 10
-python src/run_voting.py                 # 4-3 soft voting: 저장된 확률 평균 (단순 / 가중)
-python src/run_stacking.py               # 4-4 스태킹: LightGBM(부스팅) / 로지스틱 회귀 메타 모델
-python src/report_ensemble.py            # 4-5 results/ensemble_summary.md + results/ensemble_compare.png
-python src/make_ensemble_submission.py   # 4-6 outputs/submissions/ensemble_best.csv (+ .json)
+python src/run_base.py --only lr_word    # 단일 로지스틱 회귀: TF-IDF 단어 (1,2), C ∈ {1, 4, 16}
+python src/run_bagging.py                # 배깅: MultinomialNB × 10, 로지스틱 회귀(C=16) × 10
+python src/run_adaboost.py               # 부스팅: AdaBoost(MultinomialNB), n_estimators {50,100} × learning_rate {0.5,1.0}
+python src/run_voting.py --lecture       # 투표: 단순 평균 (NB+LR, NB+LR+AdaBoost)
+python src/make_lecture_results.py       # 수업 범위 결과표·요약(md)·PDF + 최종 제출 파일 final_lecture.csv
 ```
 
-- 설정(C 후보, 글자 n-gram 범위·특징 수 상한, 배깅 모델 수, 폴드 병렬 수)은 `src/config.py` 의 "앙상블 단계 설정" 한 곳에 있다.
-- 이미 끝난 실험은 건너뛴다. 다시 돌리려면 `--force`, 실험 하나만: `python src/run_base.py --exp svm_tfidf_word12_C0.1_calsig --force`.
-- 기본 모델은 `--n-jobs`(기본 2) 개 폴드를 동시에 돌린다. 글자 n-gram 은 폴드마다 메모리를 많이 써서 노트북(RAM 16GB)에 맞춰 2로 두었다.
-- 배깅 모델 수를 줄이려면 `python src/run_bagging.py --n-estimators 5` (결과표 `note` 열에 줄인 사실이 기록됨).
+- 나이브 베이즈는 NB 단계 결과(`mnb_tfidf_word12_a0.03_caliso`, `mnb_tfidf_word12_a0.03`)를 그대로 재사용한다 (다시 학습하지 않음).
+- 설정(C 후보, 배깅 모델 수, AdaBoost 설정, 폴드 병렬 수)은 `src/config.py` 의 "앙상블 단계 설정"·"수업 범위 재정리" 에 있다.
+- 이미 끝난 실험은 건너뛴다 (`--force` 로 재실행). `run_voting.py --lecture` 는 이미 있는 `vote_mean_nb-lrw` 를 덮어쓰지 않고 재사용한다.
+- 폴드는 `--n-jobs`(기본 2) 개를 동시에 돌린다 (노트북 RAM 16GB 기준). 배깅은 모델 10개를 `n_jobs=-1` 로 병렬 학습하고,
+  AdaBoost 는 순차 학습이라 `n_jobs` 가 없다.
+- `run_bagging.py` 는 로지스틱 회귀 중 OOF logloss 최저 설정(`lr_tfidf_word12_C16`)을 배깅한다.
+- PDF 는 Windows 의 Microsoft Edge(헤드리스)로 인쇄한다. Edge 가 없으면 PDF 만 건너뛰고 md 는 만든다 (`--no-pdf` 로 끌 수도 있음).
 - 빠른 점검: 각 스크립트에 `--sample 2000`. 샘플 모드는 폴드를 새로 만들기 때문에 NB 최고 설정도 먼저
   `python src/run_nb.py --exp mnb_tfidf_word12_a0.03_caliso mnb_tfidf_word12_a0.03 --sample 2000` 으로 만들어야 한다.
-- 특정 실험으로 제출 파일: `python src/make_ensemble_submission.py --exp <실험이름>` → `outputs/submissions/<실험이름>.csv`
 
-### 8-2. 각 방식 (수업 개념과 대응)
+### 8-2. 각 방식 (수업 개념)
 
-| 단계 | 수업 개념 | 내용 |
-|---|---|---|
-| 4-1 기본 모델 | (앙상블 재료) | 로지스틱 회귀(다항, softmax) — TF-IDF 단어 (1,2)-gram / 글자 char_wb (1,5)-gram(max_features 20만), C ∈ {1, 4, 16}. 선형 SVM — `CalibratedClassifierCV(LinearSVC, sigmoid)`, TF-IDF 단어 (1,2)-gram, C ∈ {0.1, 0.5}. NB 는 재사용 |
-| 4-2 배깅 | 배깅 | `BaggingClassifier(estimator, n_estimators=10, max_samples=0.8, bootstrap=True)` — 복원추출 표본마다 모델을 따로 학습하고 확률 평균. MNB(α=0.03)와 LR(단어 C=16) 각각, 같은 설정의 단일 모델과 비교 |
-| 4-3 soft voting | 투표 기반 분류기 | 저장된 OOF/테스트 확률을 평균 (재학습 없음). 단순 평균 vs 가중 평균. 가중치는 OOF logloss 최소화 (`scipy.optimize.minimize`, SLSQP, 합 1·0 이상) |
-| 4-4 스태킹 | 부스팅 | 기본 모델 4개(NB, LR 단어, LR 글자, SVM)의 OOF log 확률을 옆으로 붙인 20열이 입력, 작가가 타깃. 메타 모델 LightGBM(num_leaves 15, learning_rate 0.05, early stopping) / 비교용 로지스틱 회귀. 같은 `folds.csv` 로 다시 5-fold |
+| 방식 | 무엇을 했나 |
+|---|---|
+| 단일 모델 | 나이브 베이즈: NB 단계 최고(MultinomialNB, α=0.03, isotonic 확률 보정)와 보정 없는 버전 재사용. 로지스틱 회귀(다항, softmax): TF-IDF 단어 (1,2), C ∈ {1, 4, 16} |
+| 배깅 | `BaggingClassifier(estimator, n_estimators=10, max_samples=0.8, bootstrap=True)` — 복원추출 표본마다 모델을 따로 학습하고 확률을 평균. MultinomialNB(α=0.03)와 로지스틱 회귀(C=16) 각각, 같은 설정의 단일 모델과 비교 |
+| 부스팅 | `AdaBoostClassifier(estimator=MultinomialNB(alpha=0.03))` — 앞 NB 가 틀린 문장의 가중치를 키워 다음 NB 가 그 문장에 집중하도록 순차 학습하고, 정확한 NB 일수록 큰 가중치로 투표. n_estimators ∈ {50, 100} × learning_rate ∈ {0.5, 1.0} |
+| 투표 | soft voting 단순 평균 — 저장된 OOF/테스트 확률을 같은 비중으로 평균 (재학습 없음). NB(보정) + 로지스틱 회귀(C=16), 여기에 AdaBoost 최고(logloss 기준 `ada50_lr0.5`)를 더한 3개 |
 
-- **누수 방지**: 벡터라이저는 각 폴드의 학습 부분에만 fit. SVM 은 벡터라이저까지 Pipeline 에 넣어서 확률 보정용 내부 5-fold 에서도
-  내부 학습 부분에만 fit (NB 단계 보정과 같은 방식). LightGBM early stopping 은 검증 폴드가 아니라 학습 부분에서 떼어낸 10% 로 판단.
-- **hard voting**: 다수결은 클래스 하나만 고르고 확률을 내지 않으므로 logloss 로 평가할 수 없어 하지 않았다.
-- **스태킹 입력을 log 확률로 둔 이유**: 트리(LightGBM)는 단조 변환에 결과가 같고, 로지스틱 회귀 메타 모델에는
-  "모델별 확률의 가중 기하평균"을 배우는 꼴이 된다. isotonic 보정 NB 의 0 확률은 1e-7 로 잘라서 log 를 취했다.
+- 누수 방지: 벡터라이저는 각 폴드의 학습 부분에만 fit, 검증 폴드·테스트는 transform 만.
+- hard voting(다수결)은 클래스 하나만 고르고 확률을 내지 않으므로 logloss 로 평가할 수 없어 하지 않았다.
 
-### 8-3. 결과 파일
+### 8-3. 결과 요약 (수업 범위, 전체 54,728행, 같은 5-fold OOF)
 
-- OOF / 테스트 확률: NB 단계와 같은 `outputs/oof/{실험}.npy` (54,728 × 5), `outputs/test_pred/{실험}.npy` (19,617 × 5)
-- `results/ensemble_results.csv` 열: `exp`(실험이름) | `method`(단일/배깅/soft voting/스태킹) | `models`(사용 모델) | `settings`(설정) |
-  `logloss` | `accuracy` | `macro_f1` | `time_sec`(소요시간) | `logloss_fold_std` | `logloss_testlike`(긴문장 logloss) | `note`(비고) | …
-- `time_sec`: 5개 폴드의 벡터화+학습+예측 시간 합 (노트북 Intel Core Ultra 5 226V, 8스레드, 폴드 2개 동시 실행).
-  NB 단계 시간은 다른 PC(24코어)에서 잰 값이라 직접 비교할 수 없다.
-  `results/run_ensemble_base.log` 마지막의 총 소요(13,675s)에는 실행 중 노트북이 절전 상태였던 약 3시간 20분이 들어 있다.
-  그 사이에 돌던 `svm_tfidf_word12_C0.1_calsig` 는 `run_ensemble_svm_rerun.log` 로 다시 돌려 시간을 쟀다 (logloss 는 같음).
+전체 표 `results/lecture_scope_results.csv` (13개), 보고서용 `results/lecture_scope_summary.md`, `results/model_comparison_lecture.pdf` (A4 한 장).
 
-### 8-4. 결과 요약 (전체 54,728행, 같은 5-fold OOF)
-
-전체 표는 `results/ensemble_summary.md`, 원자료는 `results/ensemble_results.csv` (실험 20개). 그래프: `results/ensemble_compare.png`.
-
-| 방식 | 최고 실험 | OOF logloss | accuracy | macro-F1 | 긴문장 logloss |
-|---|---|---|---|---|---|
-| 나이브 베이즈 (NB 단계 최고) | `mnb_tfidf_word12_a0.03_caliso` | 0.4725 | 0.8326 | 0.8257 | 0.2863 |
-| 단일 모델 (LR / SVM) | `lr_tfidf_word12_C16` | 0.4603 | 0.8401 | 0.8326 | 0.2886 |
-| 배깅 | `bag10_lr_tfidf_word12_C16` | 0.4894 | 0.8334 | 0.8253 | 0.3286 |
-| soft voting | `vote_wopt_nb-lrw-lrc-svm` | 0.4191 | 0.8622 | 0.8562 | 0.2598 |
-| **스태킹 (LightGBM 메타)** | `stack_lgbm_nb-lrw-lrc-svm` | **0.3806** | **0.8655** | **0.8601** | **0.2047** |
+| 방식 | 최고 실험 | OOF logloss | 정확도 | Macro-F1 |
+|---|---|---|---|---|
+| 단일 NB | `mnb_tfidf_word12_a0.03_caliso` | 0.4725 | 83.26% | 82.57% |
+| 단일 LR | `lr_tfidf_word12_C16` | 0.4603 | 84.01% | 83.26% |
+| 배깅 | `bag10_lr_tfidf_word12_C16` | 0.4894 | 83.34% | 82.53% |
+| 부스팅 | `ada50_lr0.5_mnb_tfidf_word12_a0.03` | 1.5763 | 64.94% | 61.36% |
+| **투표 (최종)** | **`vote_mean_nb-lrw`** | **0.4207** | **86.05%** | **85.43%** |
 
 단계별 핵심
 
-1. **기본 모델**: 로지스틱 회귀 단어 (1,2)-gram 이 C=1 → 4 → 16 에서 0.618 → 0.500 → 0.460 으로 좋아져 NB 최고(0.4725)보다 낮았다.
-   C=16 이 후보 중 가장 커서, 더 큰 C 가 더 좋을 수 있다 (확인 안 함). 글자 n-gram LR 은 0.634 → 0.544 → 0.540 (특징 134,962개,
-   상한 20만에 안 걸림), SVM + sigmoid 보정은 C=0.1 0.542, C=0.5 0.476.
-2. **배깅**: 두 모델 모두 단일보다 나빠졌다. MNB 0.4900 → 0.5082 (+0.018), LR 0.4603 → 0.4894 (+0.029), 정확도도 조금 떨어짐.
-   분석: 복원추출 80% 표본은 서로 다른 행이 약 55% (1−e^−0.8) 뿐이라 모델마다 데이터가 줄어든다. NB·선형 모델은 원래 데이터가 조금
-   바뀌어도 예측이 크게 흔들리지 않는(분산이 작은) 모델이라 평균으로 줄일 분산이 적고, 데이터가 줄어든 손해가 더 컸다.
-   배깅은 깊은 결정트리처럼 분산이 큰 모델에서 효과가 크다.
-3. **soft voting**: 단순 평균은 NB + LR 단어 0.4207 이 가장 좋았고, 모델을 더 넣으면 오히려 나빠졌다(4개 0.4283) — 약한 모델에도
-   같은 비중을 주기 때문. 가중 평균은 4개 조합이 0.4191 로 가장 좋았고 가중치는 NB 0.455 · LR 단어 0.446 · LR 글자 0.099 · SVM 0.000.
-   폴드마다 나머지 폴드로 가중치를 다시 찾아 검증한 값도 0.4192 라서 가중치 과적합은 거의 없다.
-4. **스태킹**: LightGBM 메타 0.3806 (폴드별 best_iteration 119~169), 로지스틱 회귀 메타 0.3850. 가중 평균(0.4191)보다 크게 좋다.
-   분석: 메타 모델은 모델별 비중뿐 아니라 확률 크기(보정)와 작가별로 어느 모델을 믿을지까지 배운다.
+1. **단일 모델**: 로지스틱 회귀는 C=1 → 4 → 16 에서 0.618 → 0.500 → 0.460 으로 좋아져 NB 최고(0.4725)보다 낮았다.
+   C=16 이 후보 중 가장 커서 더 큰 C 가 더 좋을 수 있다 (확인 안 함).
+2. **배깅**: 두 모델 모두 단일보다 나빠졌다. MNB 0.4900 → 0.5082 (+0.018), 로지스틱 회귀 0.4603 → 0.4894 (+0.029).
+   분석: 복원추출 80% 표본은 서로 다른 행이 약 55%(1−e^−0.8)뿐이라 모델마다 데이터가 줄어든다. NB·선형 모델은 원래 분산이 작아
+   평균으로 줄일 분산이 적고, 데이터가 줄어든 손해가 더 컸다.
+3. **부스팅(AdaBoost)**: 4개 모두 단일 NB(보정 없음: logloss 0.4900, 정확도 82.91%)보다 크게 나빴다.
+   logloss 1.5763~1.5891, 정확도 62.53%~70.90%.
+   - logloss: sklearn 1.9 의 AdaBoost(SAMME)는 NB 의 확률이 아니라 예측 작가(hard label)의 가중 투표 f(x) 를
+     4(= 클래스 수 − 1)로 나눠 softmax 한다 (`sklearn/ensemble/_weight_boosting.py` 의 `decision_function`,
+     `_compute_proba_from_decision`). 그래서 확률이 최대 0.255 라 logloss 가 1.368 아래로 내려갈 수 없다 (균등 분포는 1.609).
+   - 정확도: n_estimators 100 이 50 보다, learning_rate 0.5 가 1.0 보다 높았다 (최고 `ada100_lr0.5` 70.90%).
+     분석(추정, 원인은 확인 안 함): NB 는 이미 강한 학습기라, 틀린 문장에 가중치를 몰아주면 다음 NB 가 그 문장들에 치우쳐 전체 정확도가 떨어진 것으로 보인다.
+4. **투표**: NB(보정) + 로지스틱 회귀(C=16) 단순 평균이 0.4207 로 수업 범위 최고다. 두 모델 각각(0.4725, 0.4603)보다 좋다.
+   AdaBoost 를 더한 3개 평균은 0.6401 로 나빠졌다. AdaBoost 확률이 균등에 가까워 3분의 1 비중으로 섞이면 전체 확률이 평평해지기 때문이다.
+   정확도는 86.05% → 86.02% 로 거의 같다.
 
-주의
+### 8-4. 최종 모델과 제출 파일
 
-- **스태킹 OOF 는 약간 낙관적일 수 있다**: 메타 모델을 1단계 OOF 를 만든 것과 같은 폴드로 검증하는데, 메타 모델의 학습 행에 붙은
-  1단계 OOF 확률은 검증 폴드 행까지 포함해 학습한 기본 모델이 만든 것이라 검증 폴드 정보가 조금 섞인다. 가중 voting 의 가중치도
-  OOF 전체로 찾았다(다만 위처럼 폴드별 재검증 값과 거의 같다).
-- **테스트는 문장이 길어 모든 모델이 더 확신한다**: 평균 최대확률이 OOF → 테스트에서 NB 0.828 → 0.892, LR 단어 0.823 → 0.866,
-  스태킹(LightGBM) 0.870 → 0.926. 메타 모델은 OOF(짧은 문장 위주) 분포로 학습했으므로 데이콘 점수가 OOF 순서와 같을지는 제출해 봐야 안다.
-  긴문장 logloss(테스트 최소 길이 이상 학습 행)에서도 스태킹이 0.2047 로 가장 좋았다.
+| 항목 | 내용 |
+|---|---|
+| 모델 | `vote_mean_nb-lrw` — soft voting 단순 평균 |
+| 구성 | `mnb_tfidf_word12_a0.03_caliso` (NB, isotonic 보정, logloss 0.4725) + `lr_tfidf_word12_C16` (로지스틱 회귀, logloss 0.4603) |
+| 성능 (OOF) | logloss 0.4207 · 정확도 86.05% · Macro-F1 85.43% |
+| NB 대비 | logloss 0.4725 → 0.4207 (−0.0518), 정확도 83.26% → 86.05% (+2.79%p) |
+| 선택 이유 | 수업 범위 실험 13개 중 OOF logloss 가 가장 낮고 정확도도 가장 높음 |
+| 제출 파일 | `outputs/submissions/final_lecture.csv` (+ `final_lecture.json`) |
 
-### 8-5. 최종 제출 파일
+- `final_lecture.csv`: 19,617행 × (`index`, `0`~`4`). `make_lecture_results.py` 가 저장한 파일을 다시 읽어 행 수, 열 이름·순서,
+  index 순서, 결측 없음, 확률 0~1, 각 행 합 1 을 검사한다 (6개 모두 통과).
+- 비교용 `nb_best.csv`(NB 단일)와 참고 실험 `ensemble_best.csv`(스태킹)는 그대로 두었다.
+- 테스트 문장이 학습보다 길어(평균 487자 vs 228자) 데이콘 점수는 OOF 와 다를 수 있다. 테스트 최소 길이 이상인 학습 행만의
+  OOF logloss(긴문장 logloss)는 최종 모델 0.2603 이다.
 
-- `outputs/submissions/ensemble_best.csv` = `stack_lgbm_nb-lrw-lrc-svm` 의 테스트 확률 (OOF logloss 최저, 어떤 실험인지는 `ensemble_best.json`)
-  - 19,617행 × (`index`, `0`~`4`), 열 순서 = `sample_submission.csv`, 각 행 합 1, 확률 최솟값 7.83e-05
-- 비교용 NB 단일 최고 제출 파일 `outputs/submissions/nb_best.csv` 는 그대로 둠
-- 앙상블 단계 환경: Python 3.13.2, scikit-learn 1.9.1, pandas 3.1.1, numpy 2.5.5, scipy 1.18.1, matplotlib 3.11.2, lightgbm 4.7.0
+### 8-5. 결과 파일
+
+- OOF / 테스트 확률: `outputs/oof/{실험}.npy` (54,728 × 5), `outputs/test_pred/{실험}.npy` (19,617 × 5) — NB 단계와 같은 형식
+- `results/lecture_scope_results.csv` (엑셀에서 한글이 깨지지 않게 UTF-8 BOM): 방식 | 실험이름 | 설정 | OOF logloss | 정확도 | Macro-F1
+- `results/ensemble_results.csv`: 앙상블 단계 전체(참고 실험 포함) 결과.
+  열 `exp | method | models | settings | logloss | accuracy | macro_f1 | time_sec | logloss_fold_std | logloss_testlike | note | …`
+- `time_sec`: 5개 폴드의 벡터화+학습+예측 시간 합 (노트북 Intel Core Ultra 5 226V, 8스레드, 폴드 2개 동시 실행).
+  수업 범위: 로지스틱 회귀 C=16 243s, 배깅 MNB 88s · 로지스틱 회귀 843s, AdaBoost 109~167s, 투표 1초 미만.
+  NB 단계 시간은 다른 PC(24코어)에서 잰 값이라 직접 비교할 수 없다.
+- `results/run_ensemble_base.log` 의 총 소요(13,675s)에는 실행 중 노트북이 절전 상태였던 약 3시간 20분이 들어 있다.
+  그 사이 돌던 `svm_tfidf_word12_C0.1_calsig` 는 `run_ensemble_svm_rerun.log` 로 다시 돌려 시간을 쟀다 (logloss 는 같음).
+- 앙상블 단계 환경: Python 3.13.2, scikit-learn 1.9.1, pandas 3.1.1, numpy 2.5.5, scipy 1.18.1, matplotlib 3.11.2,
+  lightgbm 4.7.0 (lightgbm 은 참고 실험 스태킹에만 사용)
+
+### 8-6. 참고 실험 (수업 범위 밖)
+
+수업에서 다루지 않은 기법으로 먼저 돌려 본 결과다. 최종 선택에는 쓰지 않았고, 코드와 결과 파일은 그대로 남겨 두었다.
+
+| 참고 실험 | 최고 OOF logloss | 정확도 |
+|---|---|---|
+| 로지스틱 회귀 + TF-IDF 글자 char_wb (1,5), C ∈ {1, 4, 16} | 0.5396 (C=16) | 80.69% |
+| 선형 SVM + sigmoid 확률 보정, C ∈ {0.1, 0.5} | 0.4762 (C=0.5) | 84.61% |
+| soft voting 가중 평균(scipy SLSQP 로 찾은 가중치), 글자 LR·SVM 을 넣은 조합 (7개) | 0.4191 (NB+LR 단어+LR 글자+SVM 가중 평균) | 86.22% |
+| 스태킹: 기본 모델 4개 확률 → LightGBM / 로지스틱 회귀 메타 모델 | 0.3806 (LightGBM) | 86.55% |
+
+- 실행: `python src/run_base.py` (옵션 없이 전체), `python src/run_voting.py` (옵션 없이), `python src/run_stacking.py`,
+  `python src/report_ensemble.py`, `python src/make_ensemble_submission.py` → `outputs/submissions/ensemble_best.csv` (스태킹)
+- 비교표·그래프: `results/ensemble_summary.md`, `results/ensemble_compare.png`
+- 주의: 스태킹은 1단계 OOF 를 만든 것과 같은 폴드로 메타 모델을 검증해 OOF 수치가 약간 낙관적일 수 있다.

@@ -41,6 +41,7 @@ ENS_COLUMNS = ["exp", "method", "models", "settings", "logloss", "accuracy", "ma
                "logloss_fold_std", "logloss_testlike", "note", "data_version", "n_train", "finished_at"]
 
 METHOD_SINGLE, METHOD_BAG, METHOD_VOTE, METHOD_STACK = "단일", "배깅", "soft voting", "스태킹"
+METHOD_BOOST = "부스팅"
 
 
 # ---------------------------------------------------------------------------
@@ -116,7 +117,22 @@ def load_pred(ctx, name: str):
     return oof, test_pred
 
 
-BASE_LABEL = {"nb": "NB", "lrw": "LR 단어", "lrc": "LR 글자", "svm": "SVM"}
+BASE_LABEL = {"nb": "NB", "lrw": "LR 단어", "lrc": "LR 글자", "svm": "SVM", "ada": "AdaBoost"}
+
+
+def _best_of(ctx, pattern: str, what: str, hint: str) -> str:
+    res = load_ens_results(ctx.paths)
+    sub = res[res["exp"].str.match(pattern)]
+    if sub.empty:
+        raise SystemExit(f"{what} 결과가 없습니다 → 먼저 {hint} 실행")
+    return sub.nsmallest(1, "logloss")["exp"].iloc[0]
+
+
+def pick_lecture_bases(ctx) -> dict:
+    """수업 범위 투표 재료: NB 단계 최고(보정) + 로지스틱 회귀 단어 최고 + AdaBoost 최고 (모두 OOF logloss 기준)."""
+    return {"nb": NB_BEST,
+            "lrw": _best_of(ctx, r"^lr_tfidf_word", "로지스틱 회귀(단어)", "python src/run_base.py --only lr_word"),
+            "ada": _best_of(ctx, r"^ada\d+_", "AdaBoost", "python src/run_adaboost.py")}
 
 
 def pick_bases(ctx) -> dict:

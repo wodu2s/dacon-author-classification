@@ -74,6 +74,12 @@ BAG_N_ESTIMATORS = 10                       # 배깅: 부트스트랩 표본으�
 BAG_MAX_SAMPLES = 0.8                       # 배깅: 모델 하나가 보는 표본 비율
 ENS_N_JOBS = 2                              # 기본 모델 폴드 병렬 수 (노트북 메모리 고려, --n-jobs 로 변경)
 
+# ---------------------------------------------------------------------------
+# 수업 범위 재정리 (투표·배깅·부스팅 + 단어 TF-IDF·NB·로지스틱 회귀만)
+# ---------------------------------------------------------------------------
+ADA_N_ESTIMATORS = [50, 100]                # 부스팅: 순차적으로 학습할 NB 개수
+ADA_LEARNING_RATES = [0.5, 1.0]             # 부스팅: 학습기 가중치에 곱하는 학습률 (작을수록 천천히 학습)
+
 
 def get_paths(data_version: str = DATA_VERSION, sample: int | None = None) -> SimpleNamespace:
     """출력 경로 모음. 데이터 버전/샘플 모드마다 폴더를 분리해 결과가 섞이지 않게 한다."""
@@ -93,6 +99,9 @@ def get_paths(data_version: str = DATA_VERSION, sample: int | None = None) -> Si
         ens_results_csv=root / "results" / "ensemble_results.csv",   # 앙상블 단계 결과표 (누적)
         ens_summary_md=root / "results" / "ensemble_summary.md",
         ens_plot=root / "results" / "ensemble_compare.png",
+        lecture_csv=root / "results" / "lecture_scope_results.csv",       # 수업 범위 결과표
+        lecture_md=root / "results" / "lecture_scope_summary.md",
+        lecture_pdf=root / "results" / "model_comparison_lecture.pdf",
     )
     for d in (p.oof_dir, p.test_dir, p.sub_dir, p.results_dir):
         d.mkdir(parents=True, exist_ok=True)

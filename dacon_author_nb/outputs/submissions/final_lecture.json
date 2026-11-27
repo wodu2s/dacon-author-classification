@@ -1,0 +1,18 @@
+{
+  "exp": "vote_mean_nb-lrw",
+  "method": "투표",
+  "settings": "단순 평균: NB(isotonic 보정) + 로지스틱 회귀(C=16)",
+  "oof_logloss": 0.42074204982208535,
+  "oof_accuracy": 0.8604736149685719,
+  "oof_macro_f1": 0.8543439235453437,
+  "test_pred": "outputs/test_pred/vote_mean_nb-lrw.npy",
+  "scope": "수업 범위 (투표·배깅·부스팅, 단어 TF-IDF·NB·로지스틱 회귀)",
+  "checks": {
+    "행 수 = sample_submission": true,
+    "열 이름·순서 = sample_submission": true,
+    "index 순서 = sample_submission": true,
+    "결측값 없음": true,
+    "확률 0~1 범위": true,
+    "각 행 확률 합 = 1 (오차 1e-6)": true
+  }
+}

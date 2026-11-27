@@ -1,0 +1,36 @@
+[데이터] 학습 54,728행 / 테스트 19,617행  |  폴드 C:\dev\dacon-author-classification\dacon_author_nb\outputs\folds.csv  |  출력 C:\dev\dacon-author-classification\dacon_author_nb
+[재료] nb=mnb_tfidf_word12_a0.03_caliso, lrw=lr_tfidf_word12_C16, ada=ada50_lr0.5_mnb_tfidf_word12_a0.03
+  · vote_mean_nb-lrw: 이미 있음 → 재사용 (덮어쓰지 않음)
+  ✔ vote_mean_nb-lrw-ada                     logloss 0.6401 (±0.0046)  acc 0.8602  F1 0.8540  긴문장 0.5181  (0s)
+
+===== 수업 범위 soft voting (단순 평균) =====
+  vote_mean_nb-lrw       logloss 0.4207  acc 0.8605  F1 0.8543  ← nb=mnb_tfidf_word12_a0.03_caliso + lrw=lr_tfidf_word12_C16
+  vote_mean_nb-lrw-ada   logloss 0.6401  acc 0.8602  F1 0.8540  ← nb=mnb_tfidf_word12_a0.03_caliso + lrw=lr_tfidf_word12_C16 + ada=ada50_lr0.5_mnb_tfidf_word12_a0.03
+수업 범위 결과표 (13개, 제외한 참고 실험 14개) → C:\dev\dacon-author-classification\dacon_author_nb\results\lecture_scope_results.csv
+   방식                                실험이름 OOF logloss    정확도 Macro-F1
+단일 NB       mnb_tfidf_word12_a0.03_caliso      0.4725 0.8326   0.8257
+단일 NB              mnb_tfidf_word12_a0.03      0.4900 0.8291   0.8219
+단일 LR                  lr_tfidf_word12_C1      0.6180 0.8197   0.8101
+단일 LR                  lr_tfidf_word12_C4      0.4997 0.8382   0.8305
+단일 LR                 lr_tfidf_word12_C16      0.4603 0.8401   0.8326
+   배깅        bag10_mnb_tfidf_word12_a0.03      0.5082 0.8276   0.8201
+   배깅           bag10_lr_tfidf_word12_C16      0.4894 0.8334   0.8253
+  부스팅  ada50_lr0.5_mnb_tfidf_word12_a0.03      1.5763 0.6494   0.6136
+  부스팅    ada50_lr1_mnb_tfidf_word12_a0.03      1.5863 0.6253   0.6039
+  부스팅 ada100_lr0.5_mnb_tfidf_word12_a0.03      1.5778 0.7090   0.6916
+  부스팅   ada100_lr1_mnb_tfidf_word12_a0.03      1.5891 0.6887   0.6731
+   투표                    vote_mean_nb-lrw      0.4207 0.8605   0.8543
+   투표                vote_mean_nb-lrw-ada      0.6401 0.8602   0.8540
+
+최종 모델 (OOF logloss 최저): vote_mean_nb-lrw [투표] logloss 0.4207, 정확도 0.8605, Macro-F1 0.8543
+
+제출 파일 → C:\dev\dacon-author-classification\dacon_author_nb\outputs\submissions\final_lecture.csv
+  [OK] 행 수 = sample_submission
+  [OK] 열 이름·순서 = sample_submission
+  [OK] index 순서 = sample_submission
+  [OK] 결측값 없음
+  [OK] 확률 0~1 범위
+  [OK] 각 행 확률 합 = 1 (오차 1e-6)
+  shape (19617, 6), 행 합 min 1.000000 / max 1.000000, 확률 최솟값 2.38e-09, 예측 작가 분포 [4451, 3556, 4170, 4707, 2733]
+요약 저장 → C:\dev\dacon-author-classification\dacon_author_nb\results\lecture_scope_summary.md
+PDF 저장 → C:\dev\dacon-author-classification\dacon_author_nb\results\model_comparison_lecture.pdf (1페이지)

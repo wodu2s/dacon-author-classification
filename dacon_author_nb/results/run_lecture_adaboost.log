@@ -1,0 +1,19 @@
+[데이터] 학습 54,728행 / 테스트 19,617행  |  폴드 C:\dev\dacon-author-classification\dacon_author_nb\outputs\folds.csv  |  출력 C:\dev\dacon-author-classification\dacon_author_nb
+
+[AdaBoost] ada50_lr0.5_mnb_tfidf_word12_a0.03, ada50_lr1_mnb_tfidf_word12_a0.03, ada100_lr0.5_mnb_tfidf_word12_a0.03, ada100_lr1_mnb_tfidf_word12_a0.03
+   fold 0 완료 (77s) | ada50_lr0.5_mnb_tfidf_word12_a0.03=1.5762/acc 0.6707, ada50_lr1_mnb_tfidf_word12_a0.03=1.5864/acc 0.6383, ada100_lr0.5_mnb_tfidf_word12_a0.03=1.5768/acc 0.7079, ada100_lr1_mnb_tfidf_word12_a0.03=1.5890/acc 0.6789
+   fold 1 완료 (77s) | ada50_lr0.5_mnb_tfidf_word12_a0.03=1.5761/acc 0.6299, ada50_lr1_mnb_tfidf_word12_a0.03=1.5866/acc 0.5822, ada100_lr0.5_mnb_tfidf_word12_a0.03=1.5773/acc 0.7153, ada100_lr1_mnb_tfidf_word12_a0.03=1.5877/acc 0.7113
+   fold 2 완료 (151s) | ada50_lr0.5_mnb_tfidf_word12_a0.03=1.5774/acc 0.6469, ada50_lr1_mnb_tfidf_word12_a0.03=1.5874/acc 0.6148, ada100_lr0.5_mnb_tfidf_word12_a0.03=1.5776/acc 0.7080, ada100_lr1_mnb_tfidf_word12_a0.03=1.5894/acc 0.6802
+   fold 3 완료 (152s) | ada50_lr0.5_mnb_tfidf_word12_a0.03=1.5806/acc 0.6311, ada50_lr1_mnb_tfidf_word12_a0.03=1.5853/acc 0.6452, ada100_lr0.5_mnb_tfidf_word12_a0.03=1.5810/acc 0.7032, ada100_lr1_mnb_tfidf_word12_a0.03=1.5894/acc 0.6908
+   fold 4 완료 (226s) | ada50_lr0.5_mnb_tfidf_word12_a0.03=1.5711/acc 0.6686, ada50_lr1_mnb_tfidf_word12_a0.03=1.5857/acc 0.6458, ada100_lr0.5_mnb_tfidf_word12_a0.03=1.5763/acc 0.7106, ada100_lr1_mnb_tfidf_word12_a0.03=1.5901/acc 0.6822
+  ✔ ada50_lr0.5_mnb_tfidf_word12_a0.03       logloss 1.5763 (±0.0031)  acc 0.6494  F1 0.6136  긴문장 1.5764  (109s)  [특징 168,581개(폴드 평균); 확률 = SAMME 가중 투표 softmax(f/4) → 최대 0.255, logloss 하한 1.368]
+  ✔ ada50_lr1_mnb_tfidf_word12_a0.03         logloss 1.5863 (±0.0007)  acc 0.6253  F1 0.6039  긴문장 1.5841  (117s)  [특징 168,581개(폴드 평균); 확률 = SAMME 가중 투표 softmax(f/4) → 최대 0.255, logloss 하한 1.368]
+  ✔ ada100_lr0.5_mnb_tfidf_word12_a0.03      logloss 1.5778 (±0.0017)  acc 0.7090  F1 0.6916  긴문장 1.5765  (167s)  [특징 168,581개(폴드 평균); 확률 = SAMME 가중 투표 softmax(f/4) → 최대 0.255, logloss 하한 1.368]
+  ✔ ada100_lr1_mnb_tfidf_word12_a0.03        logloss 1.5891 (±0.0008)  acc 0.6887  F1 0.6731  긴문장 1.5873  (167s)  [특징 168,581개(폴드 평균); 확률 = SAMME 가중 투표 softmax(f/4) → 최대 0.255, logloss 하한 1.368]
+
+총 소요 227s
+===== AdaBoost vs 단일 NB mnb_tfidf_word12_a0.03 (OOF logloss 0.4900) =====
+  ada50_lr0.5_mnb_tfidf_word12_a0.03 logloss 1.5763  (차이 +1.0863)  | 정확도 단일 0.8291 → 0.6494
+  ada50_lr1_mnb_tfidf_word12_a0.03   logloss 1.5863  (차이 +1.0963)  | 정확도 단일 0.8291 → 0.6253
+  ada100_lr0.5_mnb_tfidf_word12_a0.03 logloss 1.5778  (차이 +1.0878)  | 정확도 단일 0.8291 → 0.7090
+  ada100_lr1_mnb_tfidf_word12_a0.03  logloss 1.5891  (차이 +1.0991)  | 정확도 단일 0.8291 → 0.6887

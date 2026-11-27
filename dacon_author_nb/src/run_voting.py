@@ -1,6 +1,7 @@
 """4-3. 투표 기반 분류기 (soft voting): 저장된 OOF/테스트 확률을 평균해 최종 확률을 정한다 (모델 재학습 없음).
 
-  python src/run_voting.py
+  python src/run_voting.py             # 전체 조합 (단순 평균 + 가중 평균) — 참고 실험
+  python src/run_voting.py --lecture   # 수업 범위: 단순 평균만, NB+LR 단어 / NB+LR 단어+AdaBoost
 
   - 단순 평균: 모든 모델에 같은 가중치
   - 가중 평균: OOF logloss 가 최소가 되도록 가중치를 찾음 (scipy.optimize.minimize, SLSQP, 가중치 합 1·0 이상)
@@ -18,10 +19,11 @@ from scipy.optimize import minimize
 from sklearn.metrics import log_loss
 
 from config import CLASSES, N_FOLDS, add_common_args
-from ensemble_common import (BASE_LABEL, METHOD_VOTE, combo_label, load_ens_results, load_pred, pick_bases,
-                             record, setup)
+from ensemble_common import (BASE_LABEL, METHOD_VOTE, combo_label, is_done, load_ens_results, load_pred, pick_bases,
+                             pick_lecture_bases, record, setup)
 
 COMBOS = [("nb", "lrw"), ("nb", "lrc"), ("nb", "lrw", "svm"), ("nb", "lrw", "lrc", "svm")]
+LECTURE_COMBOS = [("nb", "lrw"), ("nb", "lrw", "ada")]   # 수업 범위 (--lecture)
 EPS = 1e-15
 
 
@@ -43,10 +45,41 @@ def fit_weights(p_true: np.ndarray) -> np.ndarray:
     return w / w.sum()
 
 
+def run_lecture(ctx, force: bool) -> None:
+    """수업 범위: 단순 평균 soft voting 만 (가중치 최적화 없음). 이미 있는 결과는 덮어쓰지 않고 건너뜀."""
+    bases = pick_lecture_bases(ctx)
+    print("[재료] " + ", ".join(f"{c}={n}" for c, n in bases.items()))
+    res = load_ens_results(ctx.paths)
+    for combo in LECTURE_COMBOS:
+        name = f"vote_mean_{'-'.join(combo)}"
+        if not force and is_done(name, ctx, res):
+            print(f"  · {name}: 이미 있음 → 재사용 (덮어쓰지 않음)")
+            continue
+        preds = [load_pred(ctx, bases[c]) for c in combo]
+        t0 = time.perf_counter()
+        # soft voting (단순 평균): 모델별 확률을 똑같은 비중으로 평균해 최종 확률 결정
+        oof = np.mean([p[0] for p in preds], axis=0)
+        test = np.mean([p[1] for p in preds], axis=0)
+        record(ctx, name, METHOD_VOTE, combo_label(combo, bases), "단순 평균 (가중치 동일)",
+               oof, test, time.perf_counter() - t0)
+    res = load_ens_results(ctx.paths).set_index("exp")
+    print("\n===== 수업 범위 soft voting (단순 평균) =====")
+    for combo in LECTURE_COMBOS:
+        name = f"vote_mean_{'-'.join(combo)}"
+        r = res.loc[name]
+        print(f"  {name:<22} logloss {r['logloss']:.4f}  acc {r['accuracy']:.4f}  F1 {r['macro_f1']:.4f}  ← {r['models']}")
+
+
 def main():
     ap = add_common_args(argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawTextHelpFormatter))
+    ap.add_argument("--lecture", action="store_true",
+                    help="수업 범위만: NB(보정)+LR 단어, NB(보정)+LR 단어+AdaBoost 최고 의 단순 평균")
+    ap.add_argument("--force", action="store_true", help="--lecture 에서 이미 있는 결과도 다시 계산")
     args = ap.parse_args()
     ctx = setup(args.data, args.sample)
+    if args.lecture:
+        run_lecture(ctx, args.force)
+        return
     bases = pick_bases(ctx)
     print("[재료] " + ", ".join(f"{c}={n}" for c, n in bases.items()))
     preds = {c: load_pred(ctx, n) for c, n in bases.items()}
