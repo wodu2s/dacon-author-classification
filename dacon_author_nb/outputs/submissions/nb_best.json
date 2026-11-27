@@ -1,0 +1,8 @@
+{
+  "exp": "mnb_tfidf_word12_a0.03_caliso",
+  "clip": null,
+  "oof_logloss": 0.4725207260463781,
+  "oof_accuracy": 0.832608536763631,
+  "oof_macro_f1": 0.8257357027799559,
+  "test_pred": "outputs/test_pred/mnb_tfidf_word12_a0.03_caliso.npy"
+}
